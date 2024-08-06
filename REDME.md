@@ -1,3 +1,8 @@
-# To run app
+# Deploy
 
-docker-build up --build
+Run: `docker-build up --build`
+
+# Develpment serve
+Run: `docker-build up --build`
+Run: `cd backend && npm run start`
+Run: `cd frontend && npm run start`
