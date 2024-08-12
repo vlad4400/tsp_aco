@@ -6,6 +6,7 @@ import {
   Delete,
   Param,
   Body,
+  NotFoundException,
 } from '@nestjs/common';
 import { MessageService } from '../services/message.service';
 import { Message } from '../schemas/message.schema';
@@ -26,7 +27,11 @@ export class MessageController {
 
   @Get(':id')
   async getMessageById(@Param('id') id: string): Promise<Message> {
-    return this.messageService.getMessageById(id);
+    const message = await this.messageService.getMessageById(id);
+    if (!message) {
+      throw new NotFoundException(`Message with ID ${id} not found`);
+    }
+    return message;
   }
 
   @Put(':id')
@@ -34,11 +39,19 @@ export class MessageController {
     @Param('id') id: string,
     @Body() message: Message,
   ): Promise<Message> {
-    return this.messageService.updateMessage(id, message);
+    const updatedMessage = await this.messageService.updateMessage(id, message);
+    if (!updatedMessage) {
+      throw new NotFoundException(`Message with ID ${id} not found`);
+    }
+    return updatedMessage;
   }
 
   @Delete(':id')
   async deleteMessage(@Param('id') id: string): Promise<any> {
-    return this.messageService.deleteMessage(id);
+    const deletedMessage = await this.messageService.deleteMessage(id);
+    if (!deletedMessage) {
+      throw new NotFoundException(`Message with ID ${id} not found`);
+    }
+    return deletedMessage;
   }
 }

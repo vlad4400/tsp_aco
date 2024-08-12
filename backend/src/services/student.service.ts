@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { StudentRepository } from '../repositories/student.repository';
 import { Student } from '../schemas/student.schema';
 
@@ -15,14 +15,26 @@ export class StudentService {
   }
 
   async getStudentById(id: string): Promise<Student> {
-    return this.studentRepository.findOne(id);
+    const student = await this.studentRepository.findOne(id);
+    if (!student) {
+      throw new NotFoundException(`Student with ID ${id} not found`);
+    }
+    return student;
   }
 
   async updateStudent(id: string, student: Student): Promise<Student> {
-    return this.studentRepository.update(id, student);
+    const updatedStudent = await this.studentRepository.update(id, student);
+    if (!updatedStudent) {
+      throw new NotFoundException(`Student with ID ${id} not found`);
+    }
+    return updatedStudent;
   }
 
   async deleteStudent(id: string): Promise<any> {
-    return this.studentRepository.delete(id);
+    const deletedStudent = await this.studentRepository.delete(id);
+    if (!deletedStudent) {
+      throw new NotFoundException(`Student with ID ${id} not found`);
+    }
+    return deletedStudent;
   }
 }

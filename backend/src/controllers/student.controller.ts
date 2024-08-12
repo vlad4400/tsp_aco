@@ -6,6 +6,7 @@ import {
   Param,
   Post,
   Put,
+  NotFoundException,
 } from '@nestjs/common';
 import { Student } from '../schemas/student.schema';
 import { StudentService } from '../services/student.service';
@@ -26,7 +27,11 @@ export class StudentController {
 
   @Get(':id')
   async getStudentById(@Param('id') id: string): Promise<Student> {
-    return this.studentService.getStudentById(id);
+    const student = await this.studentService.getStudentById(id);
+    if (!student) {
+      throw new NotFoundException(`Student with ID ${id} not found`);
+    }
+    return student;
   }
 
   @Put(':id')
@@ -34,11 +39,19 @@ export class StudentController {
     @Param('id') id: string,
     @Body() student: Student,
   ): Promise<Student> {
-    return this.studentService.updateStudent(id, student);
+    const updatedStudent = await this.studentService.updateStudent(id, student);
+    if (!updatedStudent) {
+      throw new NotFoundException(`Student with ID ${id} not found`);
+    }
+    return updatedStudent;
   }
 
   @Delete(':id')
   async deleteStudent(@Param('id') id: string): Promise<any> {
-    return this.studentService.deleteStudent(id);
+    const deletedStudent = await this.studentService.deleteStudent(id);
+    if (!deletedStudent) {
+      throw new NotFoundException(`Student with ID ${id} not found`);
+    }
+    return deletedStudent;
   }
 }

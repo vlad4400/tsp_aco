@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { MessageRepository } from '../repositories/message.repository';
 import { Message } from '../schemas/message.schema';
 
@@ -15,14 +15,26 @@ export class MessageService {
   }
 
   async getMessageById(id: string): Promise<Message> {
-    return this.messageRepository.findOne(id);
+    const message = await this.messageRepository.findOne(id);
+    if (!message) {
+      throw new NotFoundException(`Message with ID ${id} not found`);
+    }
+    return message;
   }
 
   async updateMessage(id: string, message: Message): Promise<Message> {
-    return this.messageRepository.update(id, message);
+    const updatedMessage = await this.messageRepository.update(id, message);
+    if (!updatedMessage) {
+      throw new NotFoundException(`Message with ID ${id} not found`);
+    }
+    return updatedMessage;
   }
 
   async deleteMessage(id: string): Promise<any> {
-    return this.messageRepository.delete(id);
+    const deletedMessage = await this.messageRepository.delete(id);
+    if (!deletedMessage) {
+      throw new NotFoundException(`Message with ID ${id} not found`);
+    }
+    return deletedMessage;
   }
 }
