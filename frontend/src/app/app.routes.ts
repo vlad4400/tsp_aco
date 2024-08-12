@@ -1,26 +1,24 @@
 import { Routes } from "@angular/router";
 
 export const routes: Routes = [
-  { path: "", redirectTo: "students", pathMatch: "full" },
+  { path: "", redirectTo: "student", pathMatch: "full" },
   {
-    path: "students",
-    loadComponent: () =>
-      import("./features/student/student.component").then(
-        (m) => m.StudentComponent
-      ),
+    path: "student",
+    loadChildren: () =>
+      import("./features/student/student.routes").then((m) => m.routes),
   },
   {
     path: "lecturer",
-    loadComponent: () =>
-      import("./features/lecturer/lecturer.component").then(
-        (m) => m.LecturerComponent
-      ),
+    loadChildren: () =>
+      import("./features/lecturer/lecturer.routes").then((m) => m.routes),
   },
   {
-    path: "messages",
-    loadComponent: () =>
-      import("./features/message/message.component").then(
-        (m) => m.MessageComponent
-      ),
+    path: "message",
+    loadChildren: () =>
+      import("./features/message/message.routes").then((m) => m.routes),
+  },
+  {
+    path: "**",
+    redirectTo: "student",
   },
 ];

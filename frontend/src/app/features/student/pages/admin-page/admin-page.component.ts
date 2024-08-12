@@ -6,7 +6,7 @@ import { Component } from '@angular/core';
   imports: [],
   template: `
     <p>
-      admin-page works!
+      student / admin-page works!
     </p>
   `,
   styles: ``

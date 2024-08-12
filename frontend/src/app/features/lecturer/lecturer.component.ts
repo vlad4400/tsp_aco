@@ -1,14 +1,11 @@
 import { Component } from '@angular/core';
+import { RouterOutlet } from '@angular/router';
 
 @Component({
   selector: 'app-lecturer',
   standalone: true,
-  imports: [],
-  template: `
-    <p>
-      lecturer works!
-    </p>
-  `,
+  imports: [RouterOutlet],
+  template: `<router-outlet />`,
   styles: ``
 })
 export class LecturerComponent {

@@ -4,11 +4,7 @@ import { Component } from '@angular/core';
   selector: 'app-admin-page',
   standalone: true,
   imports: [],
-  template: `
-    <p>
-      admin-page works!
-    </p>
-  `,
+  template: `lecturer / Admin`,
   styles: ``
 })
 export class AdminPageComponent {

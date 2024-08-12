@@ -6,7 +6,7 @@ import { Component } from '@angular/core';
   imports: [],
   template: `
     <p>
-      profile-page works!
+      student / profile-page works!
     </p>
   `,
   styles: ``
