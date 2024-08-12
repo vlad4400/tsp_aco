@@ -3,7 +3,9 @@ services:
     container_name: frontend
     build: ./frontend
     ports:
-      - "4201:4000"
+      - "4200:4200"
+    volumes:
+      - ./frontend:/app
     networks:
       - app-network
 
@@ -11,11 +13,13 @@ services:
     container_name: backend
     build: ./backend
     ports:
-      - "3001:3000"
+      - "3000:3000"
     environment:
       - MONGO_URI=mongodb://mongo:27017/msg-store
     depends_on:
       - mongo
+    volumes:
+      - ./backend:/app
     networks:
       - app-network
 
