@@ -1,12 +1,10 @@
-export interface Student {
+export interface Lecturer {
   _id: string;
   name: string;
   surname: string;
-  age: number;
 }
 
-export interface StudentDTO {
+export interface LecturerDTO {
   name: string;
   surname: string;
-  age: number;
 }

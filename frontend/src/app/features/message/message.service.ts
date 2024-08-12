@@ -1,5 +1,6 @@
+import { Injectable, inject } from "@angular/core";
 import { HttpClient } from "@angular/common/http";
-import { inject, Injectable } from "@angular/core";
+import { Observable } from "rxjs";
 import { urlAPI } from "../../app.config";
 import { Message, MessageDTO } from "./message.interface";
 
@@ -8,26 +9,25 @@ import { Message, MessageDTO } from "./message.interface";
 })
 export class MessageService {
   private readonly http: HttpClient = inject(HttpClient);
+  private readonly messagesUrlAPI = `${urlAPI}/messages`;
 
-  private readonly studentsUrlAPI = urlAPI + "/messages";
-
-  createMessage(message: MessageDTO) {
-    return this.http.post(this.studentsUrlAPI, message);
+  createMessage(message: MessageDTO): Observable<Message> {
+    return this.http.post<Message>(this.messagesUrlAPI, message);
   }
 
-  getMessages() {
-    return this.http.get<Message[]>(this.studentsUrlAPI);
+  getMessages(): Observable<Message[]> {
+    return this.http.get<Message[]>(this.messagesUrlAPI);
   }
 
-  getMessage(id: string) {
-    return this.http.get<Message>(`${this.studentsUrlAPI}/${id}`);
+  getMessage(id: string): Observable<Message> {
+    return this.http.get<Message>(`${this.messagesUrlAPI}/${id}`);
   }
 
-  updateMessage(message: Message) {
-    return this.http.put(`${this.studentsUrlAPI}/${message._id}`, message);
+  updateMessage(message: Message): Observable<Message> {
+    return this.http.put<Message>(`${this.messagesUrlAPI}/${message._id}`, message);
   }
 
-  deleteMessage(id: string) {
-    return this.http.delete(`${this.studentsUrlAPI}/${id}`);
+  deleteMessage(id: string): Observable<void> {
+    return this.http.delete<void>(`${this.messagesUrlAPI}/${id}`);
   }
 }

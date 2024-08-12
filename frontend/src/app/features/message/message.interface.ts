@@ -4,10 +4,17 @@ export interface Message {
   student: {
     _id: string;
     name: string;
+    surname: string;
+  };
+  lecturer: {
+    _id: string;
+    name: string;
+    surname: string;
   };
 }
 
 export interface MessageDTO {
   content: string;
-  student: string;
+  student: string; // studentId
+  lecturer: string; // lecturerId
 }

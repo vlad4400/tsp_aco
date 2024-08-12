@@ -1,6 +1,7 @@
-import { inject, Injectable } from "@angular/core";
-import { urlAPI } from "../../app.config";
+import { Injectable, inject } from "@angular/core";
 import { HttpClient } from "@angular/common/http";
+import { Observable } from "rxjs";
+import { urlAPI } from "../../app.config";
 import { Student, StudentDTO } from "./student.interface";
 
 @Injectable({
@@ -8,26 +9,25 @@ import { Student, StudentDTO } from "./student.interface";
 })
 export class StudentService {
   private readonly http: HttpClient = inject(HttpClient);
+  private readonly studentsUrlAPI = `${urlAPI}/students`;
 
-  private readonly studentsUrlAPI = urlAPI + "/students";
-
-  createStudent(student: StudentDTO) {
-    return this.http.post(this.studentsUrlAPI, student);
+  createStudent(student: StudentDTO): Observable<Student> {
+    return this.http.post<Student>(this.studentsUrlAPI, student);
   }
 
-  getStudents() {
+  getStudents(): Observable<Student[]> {
     return this.http.get<Student[]>(this.studentsUrlAPI);
   }
 
-  getStudent(id: string) {
+  getStudent(id: string): Observable<Student> {
     return this.http.get<Student>(`${this.studentsUrlAPI}/${id}`);
   }
 
-  updateStudent(student: Student) {
-    return this.http.put(`${this.studentsUrlAPI}/${student._id}`, student);
+  updateStudent(student: Student): Observable<Student> {
+    return this.http.put<Student>(`${this.studentsUrlAPI}/${student._id}`, student);
   }
 
-  deleteStudent(id: string) {
-    return this.http.delete(`${this.studentsUrlAPI}/${id}`);
+  deleteStudent(id: string): Observable<void> {
+    return this.http.delete<void>(`${this.studentsUrlAPI}/${id}`);
   }
 }
