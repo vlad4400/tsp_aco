@@ -1,7 +1,6 @@
 import { Component, inject, signal } from "@angular/core";
 import { Message } from "../../message.interface";
 import { MessageService } from "../../message.service";
-import { BrowserModule } from "@angular/platform-browser";
 import { CommonModule } from "@angular/common";
 
 @Component({
