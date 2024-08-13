@@ -13,7 +13,6 @@ import { Student } from "../../student.interface";
 import { StudentService } from "../../student.service";
 
 @Component({
-  selector: "app-admin-page",
   standalone: true,
   imports: [
     CommonModule,
@@ -180,10 +179,11 @@ export class AdminPageComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.loadStudents();
+    this.loadItems();
   }
 
   protected openNew(): void {
+    this.item = {};
     this.displayDialog = true;
   }
 
@@ -264,7 +264,7 @@ export class AdminPageComponent implements OnInit {
     });
   }
 
-  private loadStudents(): void {
+  private loadItems(): void {
     this.loading = true;
     this.studentService.getStudents().subscribe({
       next: (students) => {
