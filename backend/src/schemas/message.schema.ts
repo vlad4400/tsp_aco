@@ -8,9 +8,6 @@ export type MessageDocument = Message & Document;
 @Schema()
 export class Message {
   @Prop({ required: true })
-  id: string;
-
-  @Prop({ required: true })
   title: string;
 
   @Prop({ required: true })
