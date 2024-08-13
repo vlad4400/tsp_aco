@@ -1,18 +1,16 @@
 import { CommonModule } from "@angular/common";
 import { HttpErrorResponse } from "@angular/common/http";
 import { Component, effect, inject, OnInit, signal } from "@angular/core";
+import { FormsModule } from "@angular/forms";
 import { ButtonModule } from "primeng/button";
+import { DialogModule } from "primeng/dialog";
+import { InputNumberModule } from "primeng/inputnumber";
+import { InputTextModule } from "primeng/inputtext";
 import { TableModule } from "primeng/table";
 import { ToolbarModule } from "primeng/toolbar";
 import { TableColumn } from "../../../../shared/interfaces/table-column.interface";
 import { Student } from "../../student.interface";
 import { StudentService } from "../../student.service";
-import { DialogModule } from "primeng/dialog";
-import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
-import { BrowserModule } from "@angular/platform-browser";
-import { FormsModule, ReactiveFormsModule } from "@angular/forms";
-import { InputTextModule } from "primeng/inputtext";
-import { InputNumber, InputNumberModule } from "primeng/inputnumber";
 
 @Component({
   selector: "app-admin-page",
