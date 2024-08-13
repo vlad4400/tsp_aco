@@ -1,6 +1,7 @@
 export interface Message {
   _id: string;
-  content: string;
+  title: string;
+  details: string;
   student: {
     _id: string;
     name: string;
