@@ -103,7 +103,7 @@ export class ChoosePageComponent implements OnInit {
   }
 
   protected selectStudent(student: Student): void {
-    sessionStorage.setItem(SessionStorageKey.UserId, student._id);
+    sessionStorage.setItem(SessionStorageKey.User, JSON.stringify(student));
     this.router.navigate(["message"]);
   }
 

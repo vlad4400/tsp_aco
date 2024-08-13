@@ -1,3 +1,3 @@
 export enum SessionStorageKey {
-  UserId = "user-id",
+  User = "user",
 }
