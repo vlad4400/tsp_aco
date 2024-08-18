@@ -23,8 +23,20 @@ export class MessageService {
     return this.http.get<Message>(`${this.messagesUrlAPI}/${id}`);
   }
 
+  getMessageByStudentIdAndLecturerId(
+    studentId: string,
+    lecturerId: string
+  ): Observable<Message[]> {
+    return this.http.get<Message[]>(`${this.messagesUrlAPI}/search`, {
+      params: { studentId, lecturerId },
+    });
+  }
+
   updateMessage(message: Message): Observable<Message> {
-    return this.http.put<Message>(`${this.messagesUrlAPI}/${message._id}`, message);
+    return this.http.put<Message>(
+      `${this.messagesUrlAPI}/${message._id}`,
+      message
+    );
   }
 
   deleteMessage(id: string): Observable<void> {

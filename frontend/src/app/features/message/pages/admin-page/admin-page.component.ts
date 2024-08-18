@@ -8,18 +8,22 @@ import {
   OnInit,
   signal,
 } from "@angular/core";
+import { FormsModule } from "@angular/forms";
 import { Router } from "@angular/router";
 import { AvatarModule } from "primeng/avatar";
 import { ButtonModule } from "primeng/button";
 import { DataViewModule } from "primeng/dataview";
+import { InputTextModule } from "primeng/inputtext";
+import { InputTextareaModule } from "primeng/inputtextarea";
 import { RippleModule } from "primeng/ripple";
 import { ToolbarModule } from "primeng/toolbar";
 import { Lecturer } from "../../../lecturer/lecturer.interface";
 import { LecturerService } from "../../../lecturer/lecturer.service";
 import { SessionStorageKey } from "../../../session-storage-key.enum";
 import { Student } from "../../../student/student.interface";
-import { Message } from "../../message.interface";
+import { Message, MessageDTO } from "../../message.interface";
 import { MessageService } from "../../message.service";
+import { ProgressBarModule } from "primeng/progressbar";
 
 @Component({
   selector: "app-admin-page",
@@ -31,78 +35,166 @@ import { MessageService } from "../../message.service";
     DataViewModule,
     AvatarModule,
     RippleModule,
+    InputTextModule,
+    InputTextareaModule,
+    FormsModule,
+    ProgressBarModule,
   ],
   template: `
-    <p-toolbar styleClass="mb-4 gap-2">
-      <ng-template pTemplate="left">{{ userFullName() }}</ng-template>
+    <div style="height: calc(100vh - 16px); overflow: hidden">
+      <p-toolbar styleClass="mb-4 gap-2">
+        <ng-template pTemplate="left">{{ userFullName() }}</ng-template>
 
-      <ng-template pTemplate="center"> Powiadomienia </ng-template>
+        <ng-template pTemplate="center"> Powiadomienia </ng-template>
 
-      <ng-template pTemplate="right">
-        <p-button
-          label="Wyloguj"
-          icon="pi pi-sign-out"
-          outlined="true"
-          (onClick)="exit()"
-        />
-      </ng-template>
-    </p-toolbar>
+        <ng-template pTemplate="right">
+          <p-button
+            label="Wyloguj"
+            icon="pi pi-sign-out"
+            outlined="true"
+            (onClick)="exit()"
+          />
+        </ng-template>
+      </p-toolbar>
 
-    <div class="grid m-1 gap-1">
-      <div class="col-4 surface-ground border-round">
-        <p>Wykładowcy</p>
+      <div class="body m-1 gap-1">
+        <div class="sidebar surface-ground border-round">
+          <p>Wykładowcy</p>
 
-        <p-dataView #dv [value]="lecturersView">
-          <ng-template pTemplate="list" let-items>
-            <div class="grid grid-nogutter">
-              <ng-container *ngFor="let item of items; let first = first">
-                <div
-                  class="col-12 cursor-pointer"
-                  [class.surface-50]="
-                    selectedLecturer()
-                      ? selectedLecturer()?._id === item._id
-                      : first
-                  "
-                  pRipple
-                  (click)="selectLecturer(item)"
-                >
+          <p-dataView #dv [value]="lecturersView">
+            <ng-template pTemplate="list" let-items>
+              <div
+                class="grid grid-nogutter"
+                style="max-height: calc(100vh - 175px); overflow: auto"
+              >
+                <ng-container *ngFor="let item of items; let first = first">
                   <div
-                    class="flex flex-column sm:flex-row sm:align-items-center p-4 gap-3"
-                    [ngClass]="{ 'border-top-1 surface-border': !first }"
+                    pRipple
+                    class="col-12 cursor-pointer"
+                    [class.surface-50]="selectedLecturer()?._id === item._id"
+                    (click)="selectLecturer(item)"
                   >
-                    <div class="">
-                      <p-avatar [label]="item.name[0]" size="normal" />
+                    <div
+                      class="flex flex-column sm:flex-row sm:align-items-center p-4 gap-3"
+                      [ngClass]="{ 'border-top-1 surface-border': !first }"
+                    >
+                      <div class="">
+                        <p-avatar [label]="item.name[0]" size="normal" />
+                      </div>
+                      <div class="">{{ item.name }} {{ item.surname }}</div>
                     </div>
-                    <div class="">{{ item.name }} {{ item.surname }}</div>
                   </div>
-                </div>
-              </ng-container>
+                </ng-container>
+              </div>
+            </ng-template>
+          </p-dataView>
+        </div>
+        <div class="main">
+          <p>Powiadomienia</p>
+          <ng-container *ngIf="!loading">
+            <div
+              *ngIf="!selectedLecturer()"
+              class="text-color-secondary text-center"
+            >
+              Wybierz wykładowcę
             </div>
-          </ng-template>
-        </p-dataView>
-      </div>
-      <div class="col-7">
-        <p>Powiadomienia</p>
-        <div class="grid">
-          <div
-            class="col-12 surface-ground border-round p-4"
-            *ngFor="let message of messagesView"
-          >
-            <div class="flex flex-column gap-1">
-              <div class="flex flex-row justify-content-between">
-                <div class="font-medium">{{ message.title }}</div>
-                <div class="text-secondary">
-                  {{ message.lecturer.name }} {{ message.lecturer.surname }}
+            <div
+              *ngIf="selectedLecturer() && !messagesView.length"
+              class="text-color-secondary text-center"
+            >
+              Brak powiadomień
+            </div>
+            <div *ngIf="selectedLecturer()" class="grid">
+              <div
+                class="col-12 surface-ground border-round p-4"
+                *ngFor="let message of messagesView"
+              >
+                <div class="flex flex-column gap-1">
+                  <div class="flex flex-row justify-content-between">
+                    <div class="font-medium">{{ message.title }}</div>
+                    <div class="text-secondary">
+                      {{ message.createdAt | date : "dd.MM.yyyy HH:mm" }}
+                    </div>
+                  </div>
+                  <div class="text-justify">{{ message.details }}</div>
                 </div>
               </div>
-              <div class="text-justify">{{ message.details }}</div>
             </div>
-          </div>
+
+            <!-- Fixed input section at the bottom -->
+            <div
+              *ngIf="selectedLecturer()"
+              class="msg-send-box surface-ground border-round"
+            >
+              <div class="grid">
+                <div class="col-9 flex flex-column gap-2">
+                  <input
+                    type="text"
+                    pInputText
+                    [(ngModel)]="newMessageTitle"
+                    placeholder="Tytuł powiadomienia"
+                  />
+                  <textarea
+                    rows="3"
+                    pInputTextarea
+                    [(ngModel)]="newMessageDetails"
+                    [autoResize]="true"
+                    placeholder="Szczegóły powiadomienia"
+                  ></textarea>
+                </div>
+                <div
+                  class="
+                  w-100
+                  col-3
+                  flex
+                  flex-row
+                  justify-content-start
+                  align-items-end
+                "
+                >
+                  <p-button
+                    label="Wyślij"
+                    icon="pi pi-send"
+                    (onClick)="sendMessage()"
+                  ></p-button>
+                </div>
+              </div>
+            </div>
+          </ng-container>
+
+          <ng-container *ngIf="loading">
+            <p-progressBar mode="indeterminate" [style]="{ height: '6px' }" />
+          </ng-container>
         </div>
       </div>
     </div>
   `,
-  styles: ``,
+  styles: `
+    .body {
+      display: grid;
+      grid-template-columns: 250px 1fr;
+      grid-gap: 1rem;
+      height: calc(100vh - 16px);
+      overflow: hidden;
+    }
+    .sidebar {
+      overflow: auto;
+      max-height: calc(100vh - 16px);
+      width: 250px;
+    }
+    .main {
+      overflow: hidden auto;
+      max-height: calc(100vh - 250px);
+      width: 100%;
+      
+      .msg-send-box {
+        position: fixed;
+        bottom: 0;
+        right: 0.75rem;
+        width: calc(100% - 250px - 2 * 0.75rem - 15px);
+      }
+    }
+  `,
 })
 export class AdminPageComponent implements OnInit {
   private readonly router = inject(Router);
@@ -120,16 +212,27 @@ export class AdminPageComponent implements OnInit {
 
   private readonly messageService = inject(MessageService);
   protected readonly messages = signal<Message[]>([]);
+  protected newMessageTitle = "";
+  protected newMessageDetails = "";
 
   protected lecturersView = this.lecturers();
   protected messagesView = this.messages();
 
-  private loading = false;
+  protected loading = false;
 
   constructor() {
     effect(() => {
       this.lecturersView = this.lecturers();
+    });
+
+    effect(() => {
       this.messagesView = this.messages();
+    });
+
+    effect(() => {
+      if (this.selectedLecturer()) {
+        this.loadMessages();
+      }
     });
   }
 
@@ -146,6 +249,35 @@ export class AdminPageComponent implements OnInit {
     this.selectedLecturer.set(lecturer);
   }
 
+  protected sendMessage(): void {
+    const lecturer = this.selectedLecturer();
+
+    if (!lecturer || !this.newMessageTitle || !this.newMessageDetails) {
+      return;
+    }
+
+    const message: MessageDTO = {
+      title: this.newMessageTitle,
+      details: this.newMessageDetails,
+      student: this.currentUser()._id,
+      lecturer: lecturer._id,
+    };
+
+    this.loading = true;
+    this.messageService.createMessage(message).subscribe({
+      next: (message) => {
+        this.loading = false;
+        this.messages.set([...this.messages(), message]);
+        this.newMessageTitle = "";
+        this.newMessageDetails = "";
+      },
+      error: (error: HttpErrorResponse) => {
+        console.error("Failed to send message", error);
+        this.loading = false;
+      },
+    });
+  }
+
   private loadLecturers(): void {
     this.loading = true;
     this.lecturerSerivice.getLecturers().subscribe({
@@ -158,5 +290,24 @@ export class AdminPageComponent implements OnInit {
         this.loading = false;
       },
     });
+  }
+
+  private loadMessages(): void {
+    this.loading = true;
+    this.messageService
+      .getMessageByStudentIdAndLecturerId(
+        this.currentUser()._id,
+        this.selectedLecturer()?._id || ""
+      )
+      .subscribe({
+        next: (messages) => {
+          this.messages.set(messages);
+          this.loading = false;
+        },
+        error: (error: HttpErrorResponse) => {
+          console.error(error);
+          this.loading = false;
+        },
+      });
   }
 }
