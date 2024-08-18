@@ -22,6 +22,16 @@ export class MessageService {
     return message;
   }
 
+  async getMessagesByStudentIdAndLecturerId(
+    studentId: string,
+    lecturerId: string,
+  ): Promise<Message[]> {
+    return this.messageRepository.findByStudentIdAndLecturerId(
+      studentId,
+      lecturerId,
+    );
+  }
+
   async updateMessage(id: string, message: Message): Promise<Message> {
     const updatedMessage = await this.messageRepository.update(id, message);
     if (!updatedMessage) {

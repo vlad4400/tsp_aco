@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { Message, MessageDocument } from '../schemas/message.schema';
+import { Message, MessageDocument } from 'src/schemas/message.schema';
 
 @Injectable()
 export class MessageRepository {
@@ -15,11 +15,28 @@ export class MessageRepository {
   }
 
   async findAll(): Promise<Message[]> {
-    return this.messageModel.find().populate('student').exec();
+    return this.messageModel
+      .find()
+      .populate('student')
+      .populate('lecturer')
+      .exec();
   }
 
   async findOne(id: string): Promise<Message> {
-    return this.messageModel.findById(id).populate('student').exec();
+    return this.messageModel
+      .findById(id)
+      .populate('student')
+      .populate('lecturer')
+      .exec();
+  }
+
+  async findByStudentIdAndLecturerId(
+    studentId: string,
+    lecturerId: string,
+  ): Promise<Message[]> {
+    return this.messageModel
+      .find({ student: studentId, lecturer: lecturerId })
+      .exec();
   }
 
   async update(id: string, message: Message): Promise<Message> {

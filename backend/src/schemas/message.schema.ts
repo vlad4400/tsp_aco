@@ -13,6 +13,9 @@ export class Message {
   @Prop({ required: true })
   details: string;
 
+  @Prop({ default: Date.now })
+  createdAt: Date;
+
   @Prop({ type: Types.ObjectId, ref: Student.name, required: true })
   student: Types.ObjectId;
 

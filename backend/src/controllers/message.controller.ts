@@ -7,6 +7,7 @@ import {
   Param,
   Body,
   NotFoundException,
+  Query,
 } from '@nestjs/common';
 import { MessageService } from '../services/message.service';
 import { Message } from '../schemas/message.schema';
@@ -23,6 +24,17 @@ export class MessageController {
   @Get()
   async getAllMessages(): Promise<Message[]> {
     return this.messageService.getAllMessages();
+  }
+
+  @Get('search')
+  async getMessagesByStudentIdAndLecturerId(
+    @Query('studentId') studentId: string,
+    @Query('lecturerId') lecturerId: string,
+  ): Promise<Message[]> {
+    return this.messageService.getMessagesByStudentIdAndLecturerId(
+      studentId,
+      lecturerId,
+    );
   }
 
   @Get(':id')
