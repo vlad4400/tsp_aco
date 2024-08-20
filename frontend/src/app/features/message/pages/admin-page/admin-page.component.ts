@@ -58,7 +58,7 @@ import { ProgressBarModule } from "primeng/progressbar";
       </p-toolbar>
 
       <div class="body m-1 gap-1">
-        <div class="sidebar surface-ground border-round">
+        <div class="sidebar border-round">
           <p>Wykładowcy</p>
 
           <p-dataView #dv [value]="lecturersView">
@@ -71,7 +71,9 @@ import { ProgressBarModule } from "primeng/progressbar";
                   <div
                     pRipple
                     class="col-12 cursor-pointer"
-                    [class.surface-50]="selectedLecturer()?._id === item._id"
+                    [class.surface-section]="
+                      selectedLecturer()?._id === item._id
+                    "
                     (click)="selectLecturer(item)"
                   >
                     <div
@@ -105,15 +107,23 @@ import { ProgressBarModule } from "primeng/progressbar";
               Brak powiadomień
             </div>
             <div *ngIf="selectedLecturer()" class="grid">
-              <div
-                class="col-12 surface-ground border-round p-4"
-                *ngFor="let message of messagesView"
-              >
-                <div class="flex flex-column gap-1">
+              <div class="col-12" *ngFor="let message of messagesView">
+                <div
+                  class="m-1 p-3 flex flex-column gap-1 surface-ground border-round"
+                >
                   <div class="flex flex-row justify-content-between">
                     <div class="font-medium">{{ message.title }}</div>
-                    <div class="text-secondary">
-                      {{ message.createdAt | date : "dd.MM.yyyy HH:mm" }}
+                    <div class="right-side">
+                      <div class="text-secondary">
+                        {{ message.createdAt | date : "dd.MM.yyyy HH:mm" }}
+                      </div>
+                      <p-button
+                        icon="pi pi-times"
+                        [rounded]="true"
+                        [text]="true"
+                        severity="danger"
+                        (onClick)="removeItem(message._id)"
+                      />
                     </div>
                   </div>
                   <div class="text-justify">{{ message.details }}</div>
@@ -124,7 +134,7 @@ import { ProgressBarModule } from "primeng/progressbar";
             <!-- Fixed input section at the bottom -->
             <div
               *ngIf="selectedLecturer()"
-              class="msg-send-box surface-ground border-round"
+              class="msg-send-box surface-ground border-round p-2"
             >
               <div class="grid">
                 <div class="col-9 flex flex-column gap-2">
@@ -186,6 +196,11 @@ import { ProgressBarModule } from "primeng/progressbar";
       overflow: hidden auto;
       max-height: calc(100vh - 250px);
       width: 100%;
+
+      .right-side {
+        display: flex;
+        align-items: center;
+      }
       
       .msg-send-box {
         position: fixed;
@@ -274,6 +289,20 @@ export class AdminPageComponent implements OnInit {
       error: (error: HttpErrorResponse) => {
         console.error("Failed to send message", error);
         this.loading = false;
+      },
+    });
+  }
+
+  protected removeItem(messageId: string): void {
+    this.loading = true;
+    this.messageService.deleteMessage(messageId).subscribe({
+      next: () => {
+        this.loading = false;
+        this.messages.set(this.messages().filter((m) => m._id !== messageId));
+      },
+      error: (error: HttpErrorResponse) => {
+        this.loading = false;
+        console.error("Failed to remove message", error);
       },
     });
   }

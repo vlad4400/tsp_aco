@@ -2,14 +2,15 @@ import { CommonModule } from "@angular/common";
 import { HttpErrorResponse } from "@angular/common/http";
 import { Component, effect, inject, OnInit, signal } from "@angular/core";
 import { Router, RouterOutlet } from "@angular/router";
+import { AvatarModule } from "primeng/avatar";
+import { ButtonModule } from "primeng/button";
 import { DataViewModule } from "primeng/dataview";
+import { ProgressBarModule } from "primeng/progressbar";
+import { RippleModule } from "primeng/ripple";
+import { ToolbarModule } from "primeng/toolbar";
+import { SessionStorageKey } from "../../../session-storage-key.enum";
 import { Student } from "../../student.interface";
 import { StudentService } from "../../student.service";
-import { ToolbarModule } from "primeng/toolbar";
-import { ButtonModule } from "primeng/button";
-import { AvatarModule } from "primeng/avatar";
-import { RippleModule } from "primeng/ripple";
-import { SessionStorageKey } from "../../../session-storage-key.enum";
 
 @Component({
   selector: "app-choose-page",
@@ -22,6 +23,7 @@ import { SessionStorageKey } from "../../../session-storage-key.enum";
     ButtonModule,
     AvatarModule,
     RippleModule,
+    ProgressBarModule,
   ],
   template: `
     <p-toolbar styleClass="mb-4 gap-2">
@@ -32,7 +34,7 @@ import { SessionStorageKey } from "../../../session-storage-key.enum";
       <ng-template pTemplate="right"> </ng-template>
     </p-toolbar>
     <div class="card">
-      <p-dataView #dv [value]="rows">
+      <p-dataView *ngIf="!loading" #dv [value]="rows">
         <ng-template pTemplate="list" let-items>
           <div class="grid grid-nogutter">
             <div
@@ -78,6 +80,10 @@ import { SessionStorageKey } from "../../../session-storage-key.enum";
           </div>
         </ng-template>
       </p-dataView>
+
+      <ng-container *ngIf="loading">
+        <p-progressBar mode="indeterminate" [style]="{ height: '6px' }" />
+      </ng-container>
     </div>
   `,
   styles: `
@@ -94,7 +100,7 @@ export class ChoosePageComponent implements OnInit {
   protected readonly students = signal<Student[]>([]);
 
   protected rows = this.students();
-  protected loading = false;
+  protected loading = true;
 
   constructor() {
     effect(() => {
