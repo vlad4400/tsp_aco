@@ -1,11 +1,15 @@
-import { CommonModule } from "@angular/common";
+import { CommonModule, isPlatformBrowser } from "@angular/common";
 import { HttpErrorResponse } from "@angular/common/http";
 import {
+  afterNextRender,
+  afterRender,
   Component,
   computed,
   effect,
+  Inject,
   inject,
   OnInit,
+  PLATFORM_ID,
   signal,
 } from "@angular/core";
 import { FormsModule } from "@angular/forms";
@@ -15,6 +19,7 @@ import { ButtonModule } from "primeng/button";
 import { DataViewModule } from "primeng/dataview";
 import { InputTextModule } from "primeng/inputtext";
 import { InputTextareaModule } from "primeng/inputtextarea";
+import { ProgressBarModule } from "primeng/progressbar";
 import { RippleModule } from "primeng/ripple";
 import { ToolbarModule } from "primeng/toolbar";
 import { Lecturer } from "../../../lecturer/lecturer.interface";
@@ -23,7 +28,6 @@ import { SessionStorageKey } from "../../../session-storage-key.enum";
 import { Student } from "../../../student/student.interface";
 import { Message, MessageDTO } from "../../message.interface";
 import { MessageService } from "../../message.service";
-import { ProgressBarModule } from "primeng/progressbar";
 
 @Component({
   selector: "app-admin-page",
@@ -214,11 +218,10 @@ import { ProgressBarModule } from "primeng/progressbar";
 export class AdminPageComponent implements OnInit {
   private readonly router = inject(Router);
 
-  private readonly currentUser = signal<Student>(
-    JSON.parse(sessionStorage.getItem(SessionStorageKey.User) || "{}")
-  );
+  private readonly currentUser = signal<Student | null>(null);
+
   protected userFullName = computed(() => {
-    return `${this.currentUser().name} ${this.currentUser().surname}`;
+    return `${this.currentUser()?.name} ${this.currentUser()?.surname}`;
   });
 
   private readonly lecturerSerivice = inject(LecturerService);
@@ -235,7 +238,7 @@ export class AdminPageComponent implements OnInit {
 
   protected loading = false;
 
-  constructor() {
+  constructor(@Inject(PLATFORM_ID) private platformId: Object) {
     effect(() => {
       this.lecturersView = this.lecturers();
     });
@@ -249,14 +252,50 @@ export class AdminPageComponent implements OnInit {
         this.loadMessages();
       }
     });
+
+    afterNextRender(() => {
+      // console.log("AdminPageComponent#afterNextRender");
+      if (isPlatformBrowser(this.platformId)) {
+        const user = sessionStorage.getItem(SessionStorageKey.User);
+        if (user) {
+          this.currentUser.set(JSON.parse(user));
+        } else {
+          this.exit();
+        }
+      }
+    });
   }
 
   ngOnInit(): void {
     this.loadLecturers();
+    
+    
+
+    
+
+    // afterRender(() => {
+    //   // if (isPlatformBrowser(this.platformId)) {
+    //   //   const user = sessionStorage.getItem(SessionStorageKey.User);
+    //   //   if (user) {
+    //   //     this.currentUser.set(JSON.parse(user));
+    //   //   } else {
+    //   //     this.exit();
+    //   //   }
+    //   // }
+
+    //   console.log("AdminPageComponent#afterRender");
+      
+    // });
+
+
+    // console.log("AdminPageComponent#ngOnInit");
+
   }
 
   protected exit(): void {
-    sessionStorage.removeItem(SessionStorageKey.User);
+    if (isPlatformBrowser(this.platformId)) {
+      sessionStorage.removeItem(SessionStorageKey.User);
+    }
     this.router.navigate(["/"]);
   }
 
@@ -274,7 +313,7 @@ export class AdminPageComponent implements OnInit {
     const message: MessageDTO = {
       title: this.newMessageTitle,
       details: this.newMessageDetails,
-      student: this.currentUser()._id,
+      student: this.currentUser()?._id || "",
       lecturer: lecturer._id,
     };
 
@@ -325,7 +364,7 @@ export class AdminPageComponent implements OnInit {
     this.loading = true;
     this.messageService
       .getMessageByStudentIdAndLecturerId(
-        this.currentUser()._id,
+        this.currentUser()?._id || "",
         this.selectedLecturer()?._id || ""
       )
       .subscribe({

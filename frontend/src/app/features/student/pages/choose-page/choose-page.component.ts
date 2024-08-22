@@ -1,6 +1,6 @@
-import { CommonModule } from "@angular/common";
+import { CommonModule, isPlatformBrowser } from "@angular/common";
 import { HttpErrorResponse } from "@angular/common/http";
-import { Component, effect, inject, OnInit, signal } from "@angular/core";
+import { Component, effect, Inject, inject, OnInit, PLATFORM_ID, signal } from "@angular/core";
 import { Router, RouterOutlet } from "@angular/router";
 import { AvatarModule } from "primeng/avatar";
 import { ButtonModule } from "primeng/button";
@@ -102,14 +102,16 @@ export class ChoosePageComponent implements OnInit {
   protected rows = this.students();
   protected loading = true;
 
-  constructor() {
+  constructor(@Inject(PLATFORM_ID) private platformId: Object) {
     effect(() => {
       this.rows = this.students();
     });
   }
 
   protected selectStudent(student: Student): void {
-    sessionStorage.setItem(SessionStorageKey.User, JSON.stringify(student));
+    if (isPlatformBrowser(this.platformId)) {
+      sessionStorage.setItem(SessionStorageKey.User, JSON.stringify(student));
+    }
     this.router.navigate(["message"]);
   }
 

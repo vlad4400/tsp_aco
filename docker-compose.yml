@@ -4,8 +4,6 @@ services:
     build: ./frontend
     ports:
       - "4200:4000"
-    volumes:
-      - ./frontend:/app
     networks:
       - app-network
 
@@ -18,8 +16,6 @@ services:
       - MONGO_URI=mongodb://mongo:27017/msg-store
     depends_on:
       - mongo
-    volumes:
-      - ./backend:/app
     networks:
       - app-network
 
@@ -33,22 +29,9 @@ services:
     networks:
       - app-network
 
-  # portainer:
-  #   container_name: portainer
-  #   image: portainer/portainer-ce
-  #   restart: always
-  #   ports:
-  #     - "9000:9000"
-  #   volumes:
-  #     - /var/run/docker.sock:/var/run/docker.sock
-  #     - portainer-data:/data
-  #   networks:
-  #     - app-network
-
 networks:
   app-network:
     driver: bridge
 
 volumes:
   mongo-data:
-  # portainer-data:
