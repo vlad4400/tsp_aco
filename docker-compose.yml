@@ -1,37 +1,52 @@
 services:
+  portainer:
+    container_name: portainer
+    image: portainer/portainer-ce
+    restart: always
+    ports:
+      - "9000:9000"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - portainer-data:/data
+    networks:
+      - app-network
+
   frontend:
     container_name: frontend
     build: ./frontend
     ports:
       - "4200:4000"
-    networks:
-      - app-network
-
-  backend:
-    container_name: backend
-    build: ./backend
-    ports:
-      - "3000:3000"
-    environment:
-      - MONGO_URI=mongodb://mongo:27017/msg-store
-    depends_on:
-      - mongo
-    networks:
-      - app-network
-
-  mongo:
-    container_name: mongo
-    build: ./database
-    ports:
-      - "27017:27017"
     volumes:
-      - mongo-data:/data/db
+      - ./frontend:/app
     networks:
       - app-network
+  # backend:
+  #   container_name: backend
+  #   build: ./backend
+  #   ports:
+  #     - "3000:3000"
+  #   environment:
+  #     - MONGO_URI=mongodb://mongo:27017/msg-store
+  #   depends_on:
+  #     - mongo
+  #   networks:
+  #     - app-network
+
+  #   mongo:
+  #     container_name: mongo
+  #     build: ./database
+  #     ports:
+  #       - "27017:27017"
+  #     volumes:
+  #       - mongo-data:/data/db
+  #     networks:
+  #       - app-network
 
 networks:
   app-network:
     driver: bridge
 
 volumes:
-  mongo-data:
+  portainer-data:
+
+    #   mongo-data:

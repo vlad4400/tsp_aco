@@ -1,3 +1,11 @@
+# Prepare for local development
+
+## Prepare Frontend
+
+Run `cd frontend`,
+then run `npm i`,
+then run `cd ..`.
+
 # Run the Project
 
 To start the project, use the following command: `docker compose up`
