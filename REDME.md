@@ -1,5 +1,9 @@
 # Prepare for local development
 
+## Requirements
+
+Node 18+
+
 ## Prepare Frontend
 
 Run `cd frontend`,
