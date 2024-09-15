@@ -32,27 +32,38 @@ services:
       - app-network
     environment:
       - DEBUG=1
-  # backend:
-  #   container_name: backend
-  #   build: ./backend
-  #   ports:
-  #     - "3000:3000"
-  #   # environment:
-  #   #   - MONGO_URI=mongodb://mongo:27017/msg-store
-  #   # depends_on:
-  #   #   - mongo
-  #   networks:
-  #     - app-network
+    depends_on:
+      - redis
+  redis:
+    image: redis:latest
+    ports:
+      - "6379:6379"
+    networks:
+      - app-network
+      #
+      #
+      #
+      # backend:
+      #   container_name: backend
+      #   build: ./backend
+      #   ports:
+      #     - "3000:3000"
+      #   # environment:
+      #   #   - MONGO_URI=mongodb://mongo:27017/msg-store
+      #   # depends_on:
+      #   #   - mongo
+      #   networks:
+      #     - app-network
 
-  #   mongo:
-  #     container_name: mongo
-  #     build: ./database
-  #     ports:
-  #       - "27017:27017"
-  #     volumes:
-  #       - mongo-data:/data/db
-  #     networks:
-  #       - app-network
+      #   mongo:
+      #     container_name: mongo
+      #     build: ./database
+      #     ports:
+      #       - "27017:27017"
+      #     volumes:
+      #       - mongo-data:/data/db
+      #     networks:
+      #       - app-network
 
 networks:
   app-network:
