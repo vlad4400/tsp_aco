@@ -1,0 +1,22 @@
+# Pliki Pythona
+*.py[cod]
+*.so
+
+# Środowiska wirtualne
+venv/
+env/
+.venv/
+
+# Pliki logów
+*.log
+
+# Pliki bazy danych
+*.sqlite3
+
+# Pliki tymczasowe
+*.tmp
+*.bak
+
+# Pliki migracji (opcjonalnie)
+**/migrations/*.pyc
+**/migrations/__pycache__/

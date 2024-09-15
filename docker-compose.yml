@@ -20,6 +20,18 @@ services:
       - ./frontend:/app
     networks:
       - app-network
+
+  backend:
+    container_name: backend
+    build: ./backend
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./backend:/app
+    networks:
+      - app-network
+    environment:
+      - DEBUG=1
   # backend:
   #   container_name: backend
   #   build: ./backend
