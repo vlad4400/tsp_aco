@@ -15,7 +15,7 @@ Node 18+
 Run `cd backend`,
 then run `virtualenv venv`,
 then run `source venv/bin/activate`,
-then run `pip install -r requirements.txt`,
+then run `pip install --no-cache-dir -r requirements.txt`,
 then run `deactivate`,
 then run `cd ..`.
 
