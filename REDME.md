@@ -1,8 +1,23 @@
 # Prepare for local development
 
-## Requirements
+## Requirements Backend
+
+python3
+python3-pip
+virtualenv
+
+## Requirements Frontend
 
 Node 18+
+
+## Prepare Backend
+
+Run `cd backend`,
+then run `virtualenv venv`,
+then run `source venv/bin/activate`,
+then run `pip install -r requirements.txt`,
+then run `deactivate`,
+then run `cd ..`.
 
 ## Prepare Frontend
 
