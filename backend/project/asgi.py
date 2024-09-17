@@ -2,7 +2,7 @@ import os
 from channels.routing import ProtocolTypeRouter, URLRouter
 from channels.auth import AuthMiddlewareStack
 from django.core.asgi import get_asgi_application
-import api.routing  # Upewnij się, że ścieżka jest poprawna
+import api.routing
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'project.settings')
 
