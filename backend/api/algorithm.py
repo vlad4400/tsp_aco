@@ -2,11 +2,19 @@ import threading
 import time
 import random
 import logging
+import tsplib95
+
+# Ładowanie problemu
+problem = tsplib95.load('berlin52.tsp')
+
+# Lista węzłów
+nodes = list(problem.get_nodes())
 
 from asgiref.sync import async_to_sync
 from channels.layers import get_channel_layer
 
 channel_layer = get_channel_layer()
+
 
 # Lista miast
 cities = [0, 1, 2, 3]
@@ -27,8 +35,57 @@ pheromone_matrix = [
     [1, 1, 1, 1]
 ]
 
+# Macierz odległości
+def calculate_distance_matrix(problem):
+    nodes = list(problem.get_nodes())
+    distance_matrix = {}
+    for i in nodes:
+        for j in nodes:
+            if i != j:
+                distance = problem.get_weight(i, j)
+                distance_matrix[(i, j)] = distance
+    return distance_matrix
+
+distance_matrix = calculate_distance_matrix(problem)
+
 class AntAlgorithm:
     def __init__(self):
+        self._running = False
+
+        # Pobieranie problemu z TSPLIB95
+        import tsplib95
+        import urllib.request
+
+        # Wybierz zestaw danych: 'berlin52' lub 'att48'
+        dataset = 'berlin52'
+
+        if dataset == 'berlin52':
+            url = 'http://elib.zib.de/pub/mp-testdata/tsp/tsplib/tsp/berlin52.tsp'
+            file_name = 'berlin52.tsp'
+        elif dataset == 'att48':
+            url = 'http://elib.zib.de/pub/mp-testdata/tsp/tsplib/tsp/att48.tsp'
+            file_name = 'att48.tsp'
+        else:
+            raise ValueError('Nieznany zestaw danych')
+
+        # Pobieranie pliku, jeśli nie istnieje
+        import os
+        if not os.path.exists(file_name):
+            urllib.request.urlretrieve(url, file_name)
+
+        problem = tsplib95.load(file_name)
+
+        # Inicjalizacja grafu
+        graph = Graph(problem)
+
+        # Parametry algorytmu
+        num_ants = 20
+        num_iterations = 1000000  # Duża liczba, aby algorytm mógł działać ciągle
+        evaporation_rate = 0.5
+        Q = 100
+
+        self.colony = AntColony(graph, num_ants, num_iterations, evaporation_rate, Q)
+
         self._running = False
 
     def start(self):
@@ -70,6 +127,32 @@ class AntAlgorithm:
         #         'message': 'Aktualny stan algorytmu',
         #     }
         # )
+        
+class Graph:
+    def __init__(self, problem):
+        self.nodes = list(problem.get_nodes())
+        self.distances = self.calculate_distance_matrix(problem)
+        self.pheromones = {}
+        self.initialize_pheromones()
+    
+    def calculate_distance_matrix(self, problem):
+        distance_matrix = {}
+        nodes = self.nodes
+        for i in nodes:
+            for j in nodes:
+                if i != j:
+                    distance = problem.get_weight(i, j)
+                    distance_matrix[(i, j)] = distance
+        return distance_matrix
+    
+    def initialize_pheromones(self):
+        initial_pheromone = 1.0
+        for edge in self.distances:
+            self.pheromones[edge] = initial_pheromone
+    
+    def get_distance(self, i, j):
+        return self.distances.get((i, j), float('inf'))
+
 
 class Ant:
     def __init__(self, start_city):
