@@ -39,10 +39,10 @@ class AntAlgorithm:
             }
         )
         
-        async_to_sync(channel_layer.group_send)(
-            'algorithm_updates',
-            {
-                'type': 'send_update',
-                'message': 'Aktualny stan algorytmu',
-            }
-        )
+        # async_to_sync(channel_layer.group_send)(
+        #     'algorithm_updates',
+        #     {
+        #         'type': 'send_update',
+        #         'message': 'Aktualny stan algorytmu',
+        #     }
+        # )
