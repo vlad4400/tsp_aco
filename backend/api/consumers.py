@@ -5,6 +5,19 @@ import logging
 
 logger = logging.getLogger(__name__)
 
+class AlgorithmConsumer(AsyncWebsocketConsumer):
+    async def connect(self):
+        await self.channel_layer.group_add('algorithm_updates', self.channel_name)
+        await self.accept()
+
+    async def disconnect(self, close_code):
+        await self.channel_layer.group_discard('algorithm_updates', self.channel_name)
+
+    async def send_update(self, event):
+        await self.send(text_data=json.dumps(event['message']))
+
+
+# Only for test
 class NotificationConsumer(AsyncWebsocketConsumer):
     async def connect(self):
         # Dołącz do grupy 'notifications'
