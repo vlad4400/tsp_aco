@@ -9,29 +9,21 @@ import { WebsocketService } from "./core/websocket.service";
   standalone: true,
   imports: [RouterOutlet, CommonModule],
   providers: [],
-  template: `
-    <router-outlet />
-
-    Messages:
-  
-    <div *ngFor="let message of messages()">
-      {{ message }}
-    </div>
-  `,
+  template: `<router-outlet />`,
   styles: [],
 })
 export class AppComponent {
   private readonly primengConfig = inject(PrimeNGConfig);
-  private readonly websocketService = inject(WebsocketService);
+  // private readonly websocketService = inject(WebsocketService);
 
-  protected messages = this.websocketService.messages;
+  // protected messages = this.websocketService.messages;
 
   constructor() {
     this.primengConfig.ripple = true;
 
-    setTimeout(() => {
-      console.log('Test test message #1');
-      this.websocketService.sendMessage('Test message #1');
-    }, 5000);
+    // setTimeout(() => {
+    //   console.log('Test test message #1');
+    //   this.websocketService.sendMessage('Test message #1');
+    // }, 5000);
   }
 }

@@ -18,7 +18,15 @@ export const routes: Routes = [
   //     import("./features/message/message.routes").then((m) => m.routes),
   // },
   {
-    path: "**",
-    redirectTo: "student",
+    path: "",
+    pathMatch: "full",
+    loadChildren: () =>
+      import("./features/tcp-aco/tcp-aco.routes").then((m) => m.routes),
   },
+  {
+    path: "**",
+    // redirectTo: "student",
+    redirectTo: "",
+  },
+
 ];

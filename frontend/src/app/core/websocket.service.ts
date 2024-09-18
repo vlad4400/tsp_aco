@@ -1,4 +1,5 @@
 import { Injectable, effect, signal } from '@angular/core';
+import { webSocket } from 'rxjs/webSocket';
 
 @Injectable({
   providedIn: 'root'
@@ -6,6 +7,10 @@ import { Injectable, effect, signal } from '@angular/core';
 export class WebsocketService {
   private socket!: WebSocket;
   messages = signal<any[]>([]);
+
+  get messages$() {
+    return this.socket;
+  }
 
   constructor() {
     this.connect();
