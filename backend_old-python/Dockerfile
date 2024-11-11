@@ -10,6 +10,9 @@ COPY requirements.txt /app/
 # Instalujemy zależności
 RUN pip install --no-cache-dir -r requirements.txt
 
+# Kopiujemy pliki danych
+COPY api/data/ /app/api/data/
+
 # Kopiujemy pozostałe pliki aplikacji
 COPY . /app/
 
