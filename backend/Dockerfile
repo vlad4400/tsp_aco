@@ -1,4 +1,6 @@
-FROM node:22
+FROM node:22-alpine
+
+# RUN npm install -g @nestjs/cli@10.0.0
 
 WORKDIR /app
 

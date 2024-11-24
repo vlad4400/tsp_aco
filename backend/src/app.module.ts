@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
-import { MongooseModule } from '@nestjs/mongoose';
+// import { MongooseModule } from '@nestjs/mongoose';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { LecturerController } from './controllers/lecturer.controller';
@@ -19,27 +19,27 @@ import { StudentService } from './services/student.service';
 @Module({
   imports: [
     ConfigModule.forRoot(),
-    MongooseModule.forRoot(process.env.MONGO_URI),
-    MongooseModule.forFeature([
-      { name: Student.name, schema: StudentSchema },
-      { name: Lecturer.name, schema: LecturerSchema },
-      { name: Message.name, schema: MessageSchema },
-    ]),
+    // MongooseModule.forRoot(process.env.MONGO_URI),
+    // MongooseModule.forFeature([
+    //   { name: Student.name, schema: StudentSchema },
+    //   { name: Lecturer.name, schema: LecturerSchema },
+    //   { name: Message.name, schema: MessageSchema },
+    // ]),
   ],
   controllers: [
     AppController,
-    StudentController,
-    LecturerController,
-    MessageController,
+    // StudentController,
+    // LecturerController,
+    // MessageController,
   ],
   providers: [
     AppService,
-    StudentService,
-    LecturerService,
-    MessageService,
-    StudentRepository,
-    LecturerRepository,
-    MessageRepository,
+    // StudentService,
+    // LecturerService,
+    // MessageService,
+    // StudentRepository,
+    // LecturerRepository,
+    // MessageRepository,
   ],
 })
 export class AppModule {}
