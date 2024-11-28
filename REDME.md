@@ -2,6 +2,8 @@
 
 ## Requirements Backend
 
+<!-- TODO: fix that -->
+
 python3
 python3-pip
 virtualenv
