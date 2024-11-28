@@ -2,7 +2,6 @@ import { CommonModule } from "@angular/common";
 import { Component, inject } from "@angular/core";
 import { RouterOutlet } from "@angular/router";
 import { PrimeNGConfig } from "primeng/api";
-import { WebsocketService } from "./core/websocket.service";
 
 @Component({
   selector: "app-root",
