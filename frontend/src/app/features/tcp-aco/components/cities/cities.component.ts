@@ -10,7 +10,11 @@ import { City } from '../../repositories/tcplib95.service';
     <div #chart></div>
   `,
   styles: [
-    
+    `
+      :host {
+        width: 700px;
+      }
+    `
   ],
 })
 export class CitiesComponent {

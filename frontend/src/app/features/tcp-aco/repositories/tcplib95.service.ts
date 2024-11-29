@@ -5,11 +5,13 @@ export type City = {
   y: number;
 };
 
+export type TcpCollection = 'berlin52' | 'att48';
+
 @Injectable()
 export class Tsplib95Service {
   cities = signal<City[]>([]);
 
-  setBerlin52(cities: City[]): void {
+  setCities(cities: City[]): void {
     this.cities.set(cities);
   }
 }
