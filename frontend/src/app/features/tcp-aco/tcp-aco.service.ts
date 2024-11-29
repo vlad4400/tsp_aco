@@ -2,6 +2,8 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { urlAPI } from '../../app.config';
 import { SseEvent, SseService } from './services/sse.service';
+import { City } from './repositories/tcplib95.service';
+import { Observable } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -24,8 +26,8 @@ export class TcpAcoService {
     });
   }
 
-  startAlgorithm() {
-    return this.http.post(`${this.baseUrl}/start/`, {});
+  startAlgorithm(): Observable<City[]> {
+    return this.http.post<City[]>(`${this.baseUrl}/start/`, {});
   }
 
   stopAlgorithm() {
