@@ -2,10 +2,11 @@ import { Controller, Post, Sse } from '@nestjs/common';
 import { MessageEvent } from '@nestjs/common/interfaces';
 import { Observable } from 'rxjs';
 import { SseService } from './services/sse/sse.service';
+import { Tsplib95Service } from './repositories/tsplib95/tsplib95.service';
 
 @Controller('api/aco')
 export class AcoController {
-  constructor(private readonly sseService: SseService) { }
+  constructor(private readonly sseService: SseService, private tsplib95Service: Tsplib95Service) { }
 
   @Sse('events')
   sendEvents(): Observable<MessageEvent> {
@@ -35,6 +36,8 @@ export class AcoController {
   @Post('start')
   start() {
     this.sseService.emitEvent({ type: 'aco-start', message: 'Start process' });
+
+    return this.tsplib95Service.getBerlin52();
   }
 
   @Post('stop')
