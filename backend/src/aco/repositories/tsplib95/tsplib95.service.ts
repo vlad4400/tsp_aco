@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 
-type City = {
+export type City = {
   x: number;
   y: number;
 };
