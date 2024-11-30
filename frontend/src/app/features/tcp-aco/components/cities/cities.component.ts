@@ -9,15 +9,29 @@ import { SseEvent } from '../../services/sse.service';
   standalone: true,
   imports: [ProgressBarModule],
   template: `
+
+
     <div #chart></div>
 
-    @if (loading()) {
-        <p-progressBar mode="indeterminate" [style]="{ height: '6px' }" />
-    }`,
+    <div class="progress-bar-container">
+      @if (loading()) {
+          <p-progressBar mode="indeterminate" [style]="{ height: '4px' }" />
+      }
+    </div>
+
+    @if (distance() !== null) {
+      <p>The best distance found is: <strong>{{ distance() }}</strong></p>
+      <p>Discovered during iteration: <strong>{{ interations() }}</strong></p>
+    }
+  `,
   styles: [
     `
       :host {
         width: 700px;
+
+        .progress-bar-container {
+          height: 10px;
+        }
       }
     `,
   ],
@@ -25,6 +39,8 @@ import { SseEvent } from '../../services/sse.service';
 export class CitiesComponent {
   cities = signal<City[]>([]);
   path = signal<number[]>([]);
+  distance = signal<number | null>(null);
+  interations = signal<number>(0);
   loading = signal<boolean>(false);
 
   @ViewChild('chart') chartContainer!: ElementRef;
@@ -39,6 +55,8 @@ export class CitiesComponent {
     const sseEvent = value();
 
     this.path.set(sseEvent ? sseEvent.path : []);
+    this.distance.set(sseEvent ? parseFloat(sseEvent.distance.toFixed(2)) : null);
+    this.interations.set(sseEvent ? sseEvent.iterationCount : 0);
   }
 
   @Input({ alias: 'loading', transform: (value: boolean) => signal(value), required: true })

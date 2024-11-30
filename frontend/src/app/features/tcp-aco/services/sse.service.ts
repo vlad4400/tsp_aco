@@ -5,6 +5,7 @@ import { Observable } from 'rxjs';
 export type SseEvent = {
   path: number[];
   distance: number;
+  iterationCount: number;
   finish?: boolean;
 };
 

@@ -5,6 +5,15 @@ import { urlAPI } from '../../app.config';
 import { City, TcpCollection } from './repositories/tcplib95.service';
 import { SseEvent, SseService } from './services/sse.service';
 
+export type TcpConfigs = {
+  collection: TcpCollection;
+  alpha: number;
+  beta: number;
+  evaporation: number;
+  ants: number;
+  iterations: number;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -35,8 +44,10 @@ export class TcpAcoService {
     return this.http.get<City[]>(`${this.baseUrl}/cities?collection=${collection}`);
   }
 
-  startAlgorithm(collection: TcpCollection): Observable<void> {
-    return this.http.post<void>(`${this.baseUrl}/start?collection=${collection}`, {});
+  startAlgorithm(configs: TcpConfigs): Observable<void> {
+    return this.http.post<void>(`${this.baseUrl}/start`, {
+      "ants-settings": configs
+    });
   }
 
   stopAlgorithm(): Observable<void> {
