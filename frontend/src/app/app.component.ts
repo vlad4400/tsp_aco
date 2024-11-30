@@ -13,16 +13,8 @@ import { PrimeNGConfig } from "primeng/api";
 })
 export class AppComponent {
   private readonly primengConfig = inject(PrimeNGConfig);
-  // private readonly websocketService = inject(WebsocketService);
-
-  // protected messages = this.websocketService.messages;
 
   constructor() {
     this.primengConfig.ripple = true;
-
-    // setTimeout(() => {
-    //   console.log('Test test message #1');
-    //   this.websocketService.sendMessage('Test message #1');
-    // }, 5000);
   }
 }

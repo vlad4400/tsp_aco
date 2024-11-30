@@ -1,12 +1,12 @@
 import { CommonModule } from '@angular/common';
-import { AfterRenderOptions, AfterRenderRef, AfterViewInit, Component, OnInit } from '@angular/core';
-import { TcpAcoService } from './tcp-aco.service';
-import { TcpCollection, Tsplib95Service } from './repositories/tcplib95.service';
-import { CitiesComponent } from './components/cities/cities.component';
-import { DropdownModule } from 'primeng/dropdown';
-import { ButtonModule } from 'primeng/button';
-import { MenuItem } from 'primeng/api';
+import { Component, computed, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { MenuItem } from 'primeng/api';
+import { ButtonModule } from 'primeng/button';
+import { DropdownModule } from 'primeng/dropdown';
+import { CitiesComponent } from './components/cities/cities.component';
+import { TcpCollection, Tsplib95Service } from './repositories/tcplib95.service';
+import { TcpAcoService } from './tcp-aco.service';
 
 interface CollectinOption extends MenuItem {
   value: TcpCollection;
@@ -17,7 +17,7 @@ interface CollectinOption extends MenuItem {
   standalone: true,
   imports: [CommonModule, CitiesComponent, ButtonModule, DropdownModule, FormsModule],
   template: `
-    <app-cities [cities]="tcplib95Service.cities()"></app-cities>
+    <app-cities [cities]="tcplib95Service.cities()" [path]="tcpAcoService.event()" [loading]="isRunning()"></app-cities>
     <div class="control-panel">
       <h2>Ant Colony Optimization</h2>
       <p-dropdown [(ngModel)]="selectedCollection" [options]="collections" (onChange)="onCollectionChanged($event)"></p-dropdown>
@@ -51,7 +51,15 @@ export class TcpAcoComponent implements OnInit {
 
   protected selectedCollection: TcpCollection = 'berlin52';
 
-  constructor(private tcpAcoService: TcpAcoService, protected tcplib95Service: Tsplib95Service) { }
+  protected isRunning = computed(() => {
+    const event = this.tcpAcoService.event();
+    return event ? !event.finish : false;
+  });
+
+  constructor(
+    protected tcpAcoService: TcpAcoService,
+    protected tcplib95Service: Tsplib95Service,
+  ) { }
 
   ngOnInit() {
     this.initCollection();
@@ -70,18 +78,10 @@ export class TcpAcoComponent implements OnInit {
   }
 
   protected start() {
-    this.tcpAcoService.startAlgorithm().subscribe({
-      next: () => {
-        console.log('algo started');
-      },
-    });
+    this.tcpAcoService.startAlgorithm(this.selectedCollection).subscribe();
   }
 
   protected stop() {
-    this.tcpAcoService.stopAlgorithm().subscribe({
-      next: () => {
-        console.log('algo stopped');
-      }
-    });
+    this.tcpAcoService.stopAlgorithm().subscribe();
   }
 }

@@ -1,42 +1,63 @@
-import { Component, signal, Input, WritableSignal, ViewChild, ElementRef, effect } from '@angular/core';
+import { Component, ElementRef, Input, ViewChild, WritableSignal, effect, signal } from '@angular/core';
 import * as d3 from 'd3';
+import { ProgressBarModule } from 'primeng/progressbar';
 import { City } from '../../repositories/tcplib95.service';
+import { SseEvent } from '../../services/sse.service';
 
 @Component({
   selector: 'app-cities',
   standalone: true,
-  imports: [],
+  imports: [ProgressBarModule],
   template: `
     <div #chart></div>
-  `,
+
+    @if (loading()) {
+        <p-progressBar mode="indeterminate" [style]="{ height: '6px' }" />
+    }`,
   styles: [
     `
       :host {
         width: 700px;
       }
-    `
+    `,
   ],
 })
 export class CitiesComponent {
   cities = signal<City[]>([]);
+  path = signal<number[]>([]);
+  loading = signal<boolean>(false);
 
   @ViewChild('chart') chartContainer!: ElementRef;
 
-  @Input({ alias: 'cities', transform: (value: City[]) => signal(value) })
+  @Input({ alias: 'cities', transform: (value: City[]) => signal(value), required: true })
   set inputCities(value: WritableSignal<City[]>) {
     this.cities.set(value());
+  }
+
+  @Input({ alias: 'path', transform: (value: SseEvent | null) => signal(value), required: true })
+  set inputPath(value: WritableSignal<SseEvent | null>) {
+    const sseEvent = value();
+
+    this.path.set(sseEvent ? sseEvent.path : []);
+  }
+
+  @Input({ alias: 'loading', transform: (value: boolean) => signal(value), required: true })
+  set inputLoading(value: WritableSignal<boolean>) {
+    this.loading.set(value());
   }
 
   constructor() {
     effect(() => {
       const updatedCities = this.cities();
+      const updatedPath = this.path();
+
       if (updatedCities.length) {
-        this.updateChart(updatedCities);
+        this.updateChart(updatedCities, updatedPath);
       }
     });
   }
 
-  private updateChart(cities: City[]): void {
+  private updateChart(cities: City[], path: number[]): void {
     if (!this.chartContainer) {
       return;
     }
@@ -57,31 +78,49 @@ export class CitiesComponent {
       .attr('transform', `translate(${margin.left},${margin.top})`);
 
     const xScale = d3.scaleLinear()
-      .domain([0, d3.max(cities, d => d.x) ?? 0])
+      .domain([0, d3.max(cities, (d) => d.x) ?? 0])
       .range([0, width]);
 
     const yScale = d3.scaleLinear()
-      .domain([0, d3.max(cities, d => d.y) ?? 0])
+      .domain([0, d3.max(cities, (d) => d.y) ?? 0])
       .range([height, 0]);
 
-    const circles = svg.selectAll('circle')
+    // Draw cities as circles
+    svg.selectAll('circle')
       .data(cities)
       .enter()
       .append('circle')
-      .attr('cx', (d, i) => xScale(d.x))
-      .attr('cy', (d, i) => yScale(d.y))
-      .attr('r', 5)
+      .attr('cx', (d) => xScale(d.x))
+      .attr('cy', (d) => yScale(d.y))
+      .attr('r', 3)
       .attr('fill', 'darkblue')
       .attr('opacity', 0.8);
 
-    const labels = svg.selectAll('text')
+    // Add city labels
+    svg.selectAll('text')
       .data(cities)
       .enter()
       .append('text')
-      .attr('x', (d, i) => xScale(d.x) + 8)
-      .attr('y', (d, i) => yScale(d.y))
-      .attr('font-size', '12px')
+      .attr('x', (d) => xScale(d.x) + 8)
+      .attr('y', (d) => yScale(d.y))
+      .attr('font-size', '10px')
       .attr('fill', 'black')
-      .text((d, i) => i + 1); // Point names
+      .text((_, i) => i + 1);
+
+    // Draw shortest path
+    if (path.length > 1) {
+      const line = d3.line<City>()
+        .x((d) => xScale(d.x))
+        .y((d) => yScale(d.y));
+
+      const pathCities = path.map((index) => cities[index]);
+
+      svg.append('path')
+        .datum([...pathCities, pathCities[0]]) // Close the loop
+        .attr('d', line)
+        .attr('fill', 'none')
+        .attr('stroke', 'pink')
+        .attr('stroke-width', 1);
+    }
   }
 }

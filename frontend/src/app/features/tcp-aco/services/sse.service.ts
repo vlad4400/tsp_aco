@@ -3,9 +3,10 @@ import { Inject, Injectable, NgZone, PLATFORM_ID } from '@angular/core';
 import { Observable } from 'rxjs';
 
 export type SseEvent = {
-  type: 'aco-start' | 'aco-stop',
-  message: string;
-}
+  path: number[];
+  distance: number;
+  finish?: boolean;
+};
 
 @Injectable({
   providedIn: 'root',
@@ -26,8 +27,6 @@ export class SseService {
       const eventSource = new EventSource(url);
 
       eventSource.onmessage = event => {
-        console.log('onMessage', 'asdf', event.data);
-
         this.zone.run(() => {
           observer.next(JSON.parse(event.data));
         });
