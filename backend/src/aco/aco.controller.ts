@@ -1,7 +1,16 @@
-import { BadRequestException, Controller, Get, Post, Query, Sse } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Get, Post, Query, Sse } from '@nestjs/common';
 import { map, Observable } from 'rxjs';
 import { TcpCollection, Tsplib95Service } from './repositories/tsplib95/tsplib95.service';
 import { AcoService, SseEvent } from './services/aco/aco.service';
+
+export type TcpConfigs = {
+  collection: TcpCollection;
+  alpha: number;
+  beta: number;
+  evaporation: number;
+  ants: number;
+  iterations: number;
+}
 
 @Controller('api/aco')
 export class AcoController {
@@ -34,13 +43,15 @@ export class AcoController {
   }
 
   @Post('start')
-  startAlgorithm(@Query('collection') collection: TcpCollection) {
-    if (!collection) {
-      throw new BadRequestException('Query parameter "collection" is required.');
+  startAlgorithm(@Body('ants-settings') configs: TcpConfigs) {
+
+    if (!configs) {
+      throw new BadRequestException('Body parameter "configs" is required.');
     }
 
     let cities;
-    switch (collection) {
+
+    switch (configs.collection) {
       case 'berlin52':
         cities = this.tsplib95Service.getBerlin52();
         break;
@@ -49,11 +60,11 @@ export class AcoController {
         break;
       default:
         throw new BadRequestException(
-          `Invalid type "${collection}". Allowed values are "berlin52" or "att48".`
+          `Invalid type "${configs.collection}". Allowed values are "berlin52" or "att48".`
         );
     }
 
-    this.acoService.startAlgorithm(cities);
+    this.acoService.startAlgorithm(cities, configs);
   }
 
   @Post('stop')

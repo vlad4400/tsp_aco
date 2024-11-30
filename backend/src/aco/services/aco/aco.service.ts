@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { Subject, Observable } from 'rxjs';
+import { TcpConfigs } from 'src/aco/aco.controller';
 import { City } from 'src/aco/repositories/tsplib95/tsplib95.service';
 
 export type SseEvent = {
@@ -11,11 +12,13 @@ export type SseEvent = {
 
 @Injectable()
 export class AcoService {
+    // Defaults values is setted by frontend, here are just example
     private alpha = 1.2; // Importance of pheromone
     private beta = 3.0; // Importance of distance
     private evaporationRate = 0.3; // Pheromone evaporation rate
     private antCount = 50; // Number of ants
     private iterations = 1500; // Number of iterations
+
     private pheromoneMatrix: number[][] = [];
     private shortestPathSubject = new Subject<SseEvent>();
     private stopFlag = false; // Stop flag to interrupt the algorithm
@@ -24,7 +27,9 @@ export class AcoService {
         return this.shortestPathSubject.asObservable();
     }
 
-    async startAlgorithm(cities: City[]): Promise<void> {
+    async startAlgorithm(cities: City[], configs: TcpConfigs): Promise<void> {
+        this.initConfigs(configs);
+
         this.stopFlag = false; // Reset the stop flag
         const cityCount = cities.length;
 
@@ -90,6 +95,14 @@ export class AcoService {
                 finish: true,
             }); // Notify stop
         }
+    }
+
+    private initConfigs(configs: TcpConfigs): void {
+        this.alpha = configs.alpha;
+        this.beta = configs.beta;
+        this.evaporationRate = configs.evaporation;
+        this.antCount = configs.ants;
+        this.iterations = configs.iterations;
     }
 
     private initializePheromoneMatrix(cityCount: number): void {
