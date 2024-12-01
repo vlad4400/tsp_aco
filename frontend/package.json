@@ -5,6 +5,7 @@
     "ng": "ng",
     "start": "ng serve --host 0.0.0.0 --poll 2000 --port 4000",
     "build": "ng build",
+    "build:ssr": "ng build && ng run frontend:server",
     "watch": "ng build --watch --configuration development",
     "serve:ssr:frontend": "node dist/frontend/server/server.mjs"
   },
