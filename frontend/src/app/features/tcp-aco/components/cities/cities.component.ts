@@ -1,3 +1,5 @@
+import { animate, style, transition, trigger } from '@angular/animations';
+import { CommonModule } from '@angular/common';
 import { Component, ElementRef, Input, ViewChild, WritableSignal, effect, signal } from '@angular/core';
 import * as d3 from 'd3';
 import { ProgressBarModule } from 'primeng/progressbar';
@@ -7,34 +9,73 @@ import { SseEvent } from '../../services/sse.service';
 @Component({
   selector: 'app-cities',
   standalone: true,
-  imports: [ProgressBarModule],
+  imports: [ProgressBarModule, CommonModule],
   template: `
-
-
-    <div #chart></div>
-
-    <div class="progress-bar-container">
-      @if (loading()) {
-          <p-progressBar mode="indeterminate" [style]="{ height: '4px' }" />
-      }
+    <div class="chart-container">
+      <div #chart class="chart"></div>
+  
+      <div class="progress-bar-container">
+        @if (loading()) {
+            <p-progressBar mode="indeterminate" [style]="{ height: '4px' }" />
+        }
+      </div>
     </div>
 
     @if (distance() !== null) {
-      <p>The best distance found is: <strong>{{ distance() }}</strong></p>
-      <p>Discovered during iteration: <strong>{{ interations() }}</strong></p>
+      <div
+        class="status"
+        @fadeAnimation
+      >
+        <p>The best distance found is: <strong>{{ distance() }}</strong></p>
+        <p>Discovered during iteration: <strong>{{ interations() }}</strong></p>
+      </div>
     }
   `,
   styles: [
     `
       :host {
-        width: 700px;
+        .chart-container {
+          width: 700px;
+          height: 500px;
+          background-color: rgb(255, 230, 235, 0.5);
+          border-radius: 15px;
+          backdrop-filter: blur(10px);
+          padding: 20px;
+          box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 
-        .progress-bar-container {
-          height: 10px;
+          .progress-bar-container {
+            height: 10px;
+          }
+        }
+
+        .status {
+          margin-top: 20px;
+          background-color: rgb(255, 230, 235, 0.5);
+          border-radius: 15px;
+          backdrop-filter: blur(10px);
+          padding: 5px 20px;
+          box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
         }
       }
     `,
   ],
+  animations: [
+    trigger('fadeAnimation', [
+      transition(':enter', [
+        style({ opacity: 0, transform: 'scale(0.9)' }),
+        animate(
+          '300ms ease-out',
+          style({ opacity: 1, transform: 'scale(1)' })
+        ),
+      ]),
+      transition(':leave', [
+        animate(
+          '300ms ease-in',
+          style({ opacity: 0, transform: 'scale(0.9)' })
+        ),
+      ]),
+    ]),
+  ]
 })
 export class CitiesComponent {
   cities = signal<City[]>([]);
@@ -137,8 +178,8 @@ export class CitiesComponent {
         .datum([...pathCities, pathCities[0]]) // Close the loop
         .attr('d', line)
         .attr('fill', 'none')
-        .attr('stroke', 'pink')
-        .attr('stroke-width', 1);
+        .attr('stroke', 'darkblue')
+        .attr('stroke-width', 2);
     }
   }
 }

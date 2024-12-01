@@ -1,14 +1,15 @@
+import { animate, style, transition, trigger } from '@angular/animations';
 import { CommonModule } from '@angular/common';
 import { Component, computed, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MenuItem } from 'primeng/api';
 import { ButtonModule } from 'primeng/button';
 import { DropdownModule } from 'primeng/dropdown';
+import { SliderModule } from 'primeng/slider';
+import { finalize } from 'rxjs';
 import { CitiesComponent } from './components/cities/cities.component';
 import { TcpCollection, Tsplib95Service } from './repositories/tcplib95.service';
 import { TcpAcoService } from './tcp-aco.service';
-import { SliderModule } from 'primeng/slider';
-import { finalize } from 'rxjs';
 
 interface CollectinOption extends MenuItem {
   value: TcpCollection;
@@ -19,8 +20,8 @@ interface CollectinOption extends MenuItem {
   standalone: true,
   imports: [CommonModule, CitiesComponent, ButtonModule, DropdownModule, FormsModule, SliderModule],
   template: `
-    <app-cities [cities]="tcplib95Service.cities()" [path]="tcpAcoService.event()" [loading]="isRunning()"></app-cities>
-    <div class="control-panel">
+    <app-cities @animationLeft [cities]="tcplib95Service.cities()" [path]="tcpAcoService.event()" [loading]="isRunning()"></app-cities>
+    <div @animationRight class="control-panel">
       <h2>Ant Colony Optimization</h2>
       <div class="configs">
         <p-dropdown [(ngModel)]="selectedCollection" [options]="collections" [style]="{ width: '200px' }" (onChange)="onCollectionChanged($event)"></p-dropdown>
@@ -69,10 +70,18 @@ interface CollectinOption extends MenuItem {
     :host {
       display: flex;
       justify-content: center;
+      align-items: flex-start;
       gap: 20px;
 
       .control-panel {
-        width: 200px;
+        width: 240px;
+        background-color: white;
+        background-color: rgb(255, 230, 235, 0.5);
+        border-radius: 15px;
+        opacity: 0.9;
+        backdrop-filter: blur(10px);
+        padding: 20px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 
         .configs {
           display: flex;
@@ -94,7 +103,39 @@ interface CollectinOption extends MenuItem {
         }
       }
     }
-  `]
+  `],
+  animations: [
+    trigger('animationLeft', [
+      transition(':leave', [
+        animate(
+          '400ms ease-in',
+          style({ transform: 'translateX(-100%)', opacity: 0 })
+        ),
+      ]),
+      transition(':enter', [
+        style({ transform: 'translateX(-100%)', opacity: 0 }),
+        animate(
+          '400ms ease-out',
+          style({ transform: 'translateX(0)', opacity: 1 })
+        ),
+      ]),
+    ]),
+    trigger('animationRight', [
+      transition(':leave', [
+        animate(
+          '400ms ease-in',
+          style({ transform: 'translateX(100%)', opacity: 0 })
+        ),
+      ]),
+      transition(':enter', [
+        style({ transform: 'translateX(100%)', opacity: 0 }),
+        animate(
+          '400ms ease-out',
+          style({ transform: 'translateX(0)', opacity: 1 })
+        ),
+      ]),
+    ]),
+  ],
 })
 export class TcpAcoComponent implements OnInit {
 
